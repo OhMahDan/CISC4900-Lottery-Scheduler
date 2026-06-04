@@ -1,15 +1,15 @@
 #include "vga.h"
+#include "gdt.h"
 
 void kernel_main(void) {
 
     // Call terminal_clear
     terminal_clear();
 
-    // Test terminal_scroll.
-    for(int i = 0; i < 30; i++){
-        terminal_writestring("i\n");
-    }
-    terminal_writestring("TEST");
+    // Test the GDT
+    terminal_writestring("Loading GDT...\n");
+    init_gdt();
+    terminal_writestring("GDT Loaded Successfully!\n");
 
     // DO NOT REMOVE
     // A well-designed kernel should never attempt to return.
