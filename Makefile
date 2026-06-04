@@ -5,16 +5,22 @@ ASFLAGS = --32
 LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
 
 # Final Product
-casino.bin: boot.o kernel.o string.o vga.o
-	ld $(LDFLAGS) -o casino.bin boot.o kernel.o string.o vga.o
+casino.bin: boot.o kernel.o string.o vga.o gdt.o gdt_flush.o
+	ld $(LDFLAGS) -o casino.bin boot.o kernel.o string.o vga.o gdt.o gdt_flush.o
 
-# Assembly Object
+# Assembly Objects
 boot.o: boot.s
 	$(AS) $(ASFLAGS) boot.s -o boot.o
 
-# C Object
+gdt_flush.o: gdt_flush.s
+	$(AS) $(ASFLAGS) gdt_flush.s -o gdt_flush.o
+
+# C Objects
 kernel.o: kernel.c
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.o
+
+gdt.o: gdt.c
+	$(CC) $(CFLAGS) -c gdt.c -o gdt.o
 
 # String Library Object
 string.o: string.c
