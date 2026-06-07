@@ -4,9 +4,9 @@ CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -fno-pie -fno-stack-protector
 ASFLAGS = --32
 LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
 
-# Final Product
-casino.bin: boot.o kernel.o string.o vga.o gdt.o gdt_flush.o
-	ld $(LDFLAGS) -o casino.bin boot.o kernel.o string.o vga.o gdt.o gdt_flush.o
+# Final Product 
+casino.bin: boot.o kernel.o string.o vga.o gdt.o gdt_flush.o idt.o idt_flush.o
+	ld $(LDFLAGS) -o casino.bin boot.o kernel.o string.o vga.o gdt.o gdt_flush.o idt.o idt_flush.o
 
 # Assembly Objects
 boot.o: boot.s
@@ -15,12 +15,18 @@ boot.o: boot.s
 gdt_flush.o: gdt_flush.s
 	$(AS) $(ASFLAGS) gdt_flush.s -o gdt_flush.o
 
+idt_flush.o: idt_flush.s
+	$(AS) $(ASFLAGS) idt_flush.s -o idt_flush.o
+
 # C Objects
 kernel.o: kernel.c
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.o
 
 gdt.o: gdt.c
 	$(CC) $(CFLAGS) -c gdt.c -o gdt.o
+
+idt.o: idt.c
+	$(CC) $(CFLAGS) -c idt.c -o idt.o
 
 # String Library Object
 string.o: string.c
