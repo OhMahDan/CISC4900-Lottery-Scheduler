@@ -1,3 +1,6 @@
+.section .text
+.align 4
+
 .global gdt_flush
 
 gdt_flush:
