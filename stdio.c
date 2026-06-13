@@ -1,7 +1,4 @@
-//#include "syscall.h"
-// REMOVE WHEN SYSCALL.H IS CREATED AND PUT BACK INCLUDE SYSCALL.H
-#define SYS_PUTCHAR 1
-#define SYS_GETCHAR 2
+#include "syscall.h"
 
 /* putchar
  * c = character being put in memory
