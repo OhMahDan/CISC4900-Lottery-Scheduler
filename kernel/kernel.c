@@ -1,6 +1,7 @@
 #include "vga.h"
 #include "gdt.h"
 #include "idt.h"
+#include "../user/prime.h"
 
 void kernel_main(void) {
 
@@ -17,9 +18,8 @@ void kernel_main(void) {
     init_idt();
     terminal_writestring("IDT Loaded Successfully!\n");
 
-    // Intentionally crash the kernel with a Breakpoint
-    __asm__ volatile ("int $0x3");
-    terminal_writestring("Breakpoint passed.\n");
+    // Start Prime Calculations
+    calculate_primes();
 
     // DO NOT REMOVE
     // A well-designed kernel should never attempt to return.

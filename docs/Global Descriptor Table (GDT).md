@@ -64,5 +64,17 @@ mov %ax, %fs
 mov %ax, %ss
 mov %ax, %gs
 ```
-4. **Setting the Code Segment Register**. We can use `mov` to change data segment register, but Intel forbids us from using `mov` to change the Code Segment register (`%cs`). To change `%cs`, we must execute a "Far Jump". We tell the CPU: "*Jump to the label `$.flush`, but simultaneously swap the Code Segment register to `0x08` (The Kernel Code segment)". 
+4. **Setting the Code Segment Register**. We can use `mov` to change data segment register, but Intel forbids us from using `mov` to change the Code Segment register (`%cs`). To change `%cs`, we must execute a "Far Jump". We tell the CPU: "*Jump to the label `$.flush`, but simultaneously swap the Code Segment register to `0x08` (The Kernel Code segment)".* 
 If our OS doesn't crash after initialization, we've successfully setup a 32-bit Protected Mode environment.
+# How Memory is Managed
+## Vertical Security
+The flat memory model means every segment-- Kernel Code, Kernel Data, User Code, User Data-- has a base of `0x00000000` and a limit of `4GB`. They all completely overlap.
+The CPU only knows which space is running because it tracks the current privilege level using the bottom two bits of the Code Segment (`CS`) register. This is called **CPL** (Current Privilege Level).
+- When the CPL is `00` (Ring 0), the CPU allows any memory access and privileged instructions (like `hlt`, `cli`, and `outb`).
+- When our scheduler executes `iret` to jump to a user program, it intentionally loads a Ring 3 segment selector into `CS`. The CPL becomes `11` (Ring 3). The hardware is now structurally locked. If the user program tries to execute `cli` or read a memory address that the GDT marked as Ring 0, the CPU instantly throws a General Protection Fault.
+## Lateral Security
+Because our User Data segment spans the entire 4GB of RAM, the CPU hardware considers any memory access within that 4GB perfectly legal, as long as the memory isn't flagged for Ring 0. This means if a program such as `calc.c` accidentally miscalculates a C pointer and writes data out of bounds, it might accidentally overwrite the variables belonging to another program, say `prime.c`. The CPU will not stop this, because to the CPU, both programs are authorized to be in each others space.
+## The Solution?
+Because the hardware isn't helping us laterally, the burden falls entirely on our OS design.
+For the start of the project, we simply must be extremely careful with our pointers to stay within each programs respective memory bubble.
+In the future, we will build a structure called the Process Control Block that will enable us to create "Virtual Memory" for every process that allows us to secure memory laterally.

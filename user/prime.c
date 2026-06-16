@@ -1,4 +1,34 @@
-#include <stdio.h>
+#include "../drivers/vga.h"
+
+// Copied itoa from calc.c for easy VGA printing.
+void itoa(int num, char *result){
+  char temp[12];
+  int i = 0, j = 0, neg = 0;
+  // check if num is 0
+  if(num == 0){
+    result[0] = '0';
+    result[1] = '\0';
+    return;
+  }
+  // check if num is negative and set flag if it is
+  if(num < 0){
+    neg = 1;
+    num = num * -1;
+  }
+  // extract each digit in num and convert to char
+  while(num > 0){
+    temp[i++] = (num % 10) + '0';
+    num = num / 10;
+  }
+  temp[i--] = '\0';
+  // add '-' if negative
+  if(neg)
+    result[j++] = '-';
+  // copy and reverse temp to result 
+  while(i >= 0)
+    result[j++] = temp[i--];
+    result[j] = '\0';
+}
 
 // Determine if n is prime. A prime must have TWO distinct divisors, itself and 1.
 int is_prime(int n){
@@ -15,12 +45,29 @@ int is_prime(int n){
     return 1;
 }
 
-void main() {
-    int n = 2;
+void calculate_primes() {
+    int count = 0;
+    int num = 2;
+    char buffer[32];
 
-    while(1) {
-        if(is_prime(n)){
-            putchar(n);
+    terminal_writestring("Starting Prime Generator...\n");
+
+    // Find the first 50 primes for a quick test
+    while (count < 50) {
+        int is_prime = 1;
+        for (int i = 2; i * i <= num; i++) {
+            if (num % i == 0) {
+                is_prime = 0;
+                break;
+            }
         }
+        if (is_prime) {
+            itoa(num, buffer);
+            terminal_writestring(buffer);
+            terminal_writestring(" ");
+            count++;
+        }
+        num++;
     }
+    terminal_writestring("\nDone.\n");
 }
