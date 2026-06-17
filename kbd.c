@@ -4,6 +4,7 @@
 #include "io.h"
 #include <stdint.h>
 
+#define PIC1_COMMAND 0x20
 #define KBD_DATA_PORT 0x60
 #define BUFFER_SIZE 256
 #define EOI 0x20
