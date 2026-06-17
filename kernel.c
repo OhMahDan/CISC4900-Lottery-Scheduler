@@ -3,7 +3,6 @@
 #include "idt.h"
 #include "syscall.h"
 #include "pic.h"
-#include "kbd.h"
 
 void kernel_main(void) {
 
@@ -25,9 +24,6 @@ void kernel_main(void) {
     PIC_remap();
     terminal_writestring("PIC successfully mapped!\n");
 
-    // Link IDT entry 33 to keyboard handler
-    terminal_writestring("Loading keyboard handler...\n");
-    idt_set_gate(33, interrupt_kbd_handler);
     // Enable hardware interrupts
     __asm__ volatile("sti");
     terminal_writestring("Keyboard handler loaded successfully!\n");
