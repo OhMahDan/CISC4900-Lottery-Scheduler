@@ -1,4 +1,5 @@
 #include "idt.h"
+#include "kbd.h"
 
 extern void isr0();
 extern void isr1();
@@ -101,6 +102,7 @@ void init_idt() {
     idt_set_gate(29, (uint32_t)isr29, 0x08, 0x8E);
     idt_set_gate(30, (uint32_t)isr30, 0x08, 0x8E);
     idt_set_gate(31, (uint32_t)isr31, 0x08, 0x8E);
+    idt_set_gate(33, (uint32_t)interrupt_kbd_handler, 0x08, 0x8E);
     
     idt_flush((uint32_t)&idt_ptr);
 }
