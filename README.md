@@ -16,7 +16,8 @@ To build and run Casino OS, you need a Linux/Unix environment with:
 We use a standard Makefile to compile everything.
 
 **Compiling instructions:**
-_If using Mac, delete the current `Makefile` and use `Makefile.mac`_
+
+_Note: If you're using Mac to run this OS on QEMU, make sure to use `Makefile.mac` instead of the default `Makefile`._
 ```bash 
 make       # Compile the OS only
 make run   # Compile and start the OS
