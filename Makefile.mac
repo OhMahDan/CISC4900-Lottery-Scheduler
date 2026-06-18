@@ -1,0 +1,30 @@
+CC = i686-elf-gcc
+AS = i686-elf-as
+LD = i686-elf-ld
+
+CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -fno-pie -fno-stack-protector
+ASFLAGS = --32
+LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
+
+OBJS = boot/boot.o \
+		cpu/gdt.o cpu/gdt_flush.o cpu/idt.o cpu/idt_flush.o cpu/isr_handler.o cpu/isr.o cpu/tss_flush.o \
+		drivers/kbd_wrapper.o drivers/kbd.o drivers/pic.o drivers/vga.o \
+       	kernel/kernel.o kernel/process.o \
+    	libc/string.o\
+		user/prime.o
+       
+
+casino.bin: $(OBJS)
+	$(LD) $(LDFLAGS) -o casino.bin $(OBJS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(AS) $(ASFLAGS) $< -o $@
+
+run: casino.bin 
+	qemu-system-i386 -kernel casino.bin
+
+clean:
+	rm -f $(OBJS) casino.bin
