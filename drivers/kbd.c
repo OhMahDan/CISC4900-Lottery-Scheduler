@@ -35,13 +35,15 @@ static char scan_code_table[2][89] = {
 
 /* shift = shift flag
  * buffer = input buffer
- * read_pos = read position in buffer
+ * read_pos = read position in buffer.
  * write_pos = write position in bufer
+ * read and write need to be volatile so compiler always reads the value from
+   memory, never cacheing it.
  */
 static int shift = 0;
 static char buffer[BUFFER_SIZE];
-static uint8_t read_pos = 0;
-static uint8_t write_pos = 0;
+static volatile uint8_t read_pos = 0;
+static volatile uint8_t write_pos = 0;
 
 /* interrupt_kbd_handler: Not a conventional function. It is never explicitly called
    in a program.
