@@ -22,7 +22,7 @@ char *exception_messages[] = {
 };
 
 // Master handler function.
-void fault_handler(registers_t *r) {
+void isr_dispatch(registers_t *r) {
 
     // If interrupt is a standard Intel hardware exception (0-31)
     if(r->int_no < 32) {

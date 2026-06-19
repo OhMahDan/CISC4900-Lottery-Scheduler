@@ -6,6 +6,7 @@
 static void sys_putchar(char c);
 static uint8_t sys_getchar();
 
+
 /* syscall_handler_c: Reads syscall number from eax and dispatches to
    appropriate syscall function.
  * ebx returns uint32_t so we need to type cast to char since terminal_putchar
@@ -34,5 +35,5 @@ static void sys_putchar(char c){
  * Calls on kbd getchar to read a character from input buffer
  */
 static uint8_t sys_getchar(){
-  return getchar();
+  return kbd_getchar();
 }

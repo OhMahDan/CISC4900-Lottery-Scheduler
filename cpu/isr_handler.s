@@ -22,6 +22,29 @@
         jmp isr_common  # Jump to main handler
 .endm 
 
+# IRQ Macro: mirrors ISR_NOERR so it lands in isr_common with a registers_t frame
+.macro IRQ index, vector
+    .global irq\index
+    .type irq\index, @function
+    irq\index:
+        cli
+        push $0          # Dummy error code (hardware IRQs don't push one)
+        push $\vector    # The remapped vector number
+        jmp isr_common
+.endm
+
+IRQ 1, 33    # keyboard
+# IRQ 0, 32  # timer — for later
+
+# int 0x80
+.global isr128
+.type isr128, @function
+isr128:
+    cli
+    push $0
+    push $128         
+    jmp isr_common
+
 # Routing Table for Intel Pre-built handlers.
 ISR_NOERR 0
 ISR_NOERR 1
@@ -56,10 +79,9 @@ ISR_ERR 29
 ISR_ERR 30
 ISR_NOERR 31
 
-.extern fault_handler
-.type fault_handler, @function
+.extern isr_dispatch
+.type isr_dispatch, @function
 
-# Mode Switching
 isr_common:
 
     # Push all general-purpose registers into the stack
@@ -81,7 +103,7 @@ isr_common:
 
     # Push the current value at the stack pointer and jump to it
     push %esp               
-    call fault_handler
+    call isr_dispatch
     add $4, %esp    # Delete the pushed value
 
     # Returned from the handler, begin restoring the original segment and general registers.

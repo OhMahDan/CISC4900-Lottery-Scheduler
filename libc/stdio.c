@@ -32,3 +32,15 @@ char getchar(){
 		   );
   return c;
 }
+
+int readline(char *buf, int size){
+  int n = 0;
+  while(n < size - 1){
+    char c = getchar();
+    putchar(c);
+    if(c == '\n') break;
+    buf[n++] = c;
+  }
+  buf[n] = '\0';
+  return n;
+}

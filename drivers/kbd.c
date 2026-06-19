@@ -2,6 +2,7 @@
 
 #include "kbd.h"
 #include "io.h"
+#include "isr.h"
 #include <stdint.h>
 
 #define PIC1_COMMAND 0x20
@@ -83,11 +84,12 @@ void interrupt_kbd_handler_c(){
 }
 
 // Called by user space getchar()
-char getchar(){
+char kbd_getchar(){
   /* spin if buffer is empty
    * REMOVE when scheduler is implemented.
    * REPLACE with blocking.
   */
+ __asm__ volatile("sti");
   while(read_pos == write_pos){}
   return buffer[read_pos++];
 }
