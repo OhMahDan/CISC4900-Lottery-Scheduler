@@ -1,6 +1,7 @@
 #include "idt.h"
 #include "kbd.h"
 #include "syscall.h"
+#include "isr.h"
 
 extern void isr0();
 extern void isr1();
@@ -34,6 +35,8 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
+extern void isr128();
+extern void irq1();
 
 
 // The IDT array must be exactly 256 entries.
@@ -70,6 +73,10 @@ void init_idt() {
     for (int i = 0; i < 256; i++) {
         idt_set_gate(i, 0, 0, 0);
     }
+    
+    // Register other IRQs and ISRs
+    register_interrupt_handler(128, syscall_handler_c);
+    register_interrupt_handler(33, interrupt_kbd_handler_c);
 
     idt_set_gate(0, (uint32_t)isr0, 0x08, 0x8E);
     idt_set_gate(1, (uint32_t)isr1, 0x08, 0x8E);
@@ -103,8 +110,8 @@ void init_idt() {
     idt_set_gate(29, (uint32_t)isr29, 0x08, 0x8E);
     idt_set_gate(30, (uint32_t)isr30, 0x08, 0x8E);
     idt_set_gate(31, (uint32_t)isr31, 0x08, 0x8E);
-    idt_set_gate(33, (uint32_t)interrupt_kbd_handler, 0x08, 0x8E);
-    idt_set_gate(128, (uint32_t)syscall_handler, 0x08, 0xEE);
+    idt_set_gate(33, (uint32_t)irq1, 0x08, 0x8E);
+    idt_set_gate(128, (uint32_t)isr128, 0x08, 0xEE);
     
     idt_flush((uint32_t)&idt_ptr);
 }

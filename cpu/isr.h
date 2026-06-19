@@ -13,7 +13,7 @@ typedef struct {
 // Function Pointer called isr_t, returns void and accepts registers_t as a parameter.
 typedef void (*isr_t)(registers_t*);
 
-void fault_handler(registers_t *r);
+void isr_dispatch(registers_t *r);
 void register_interrupt_handler(uint8_t n, isr_t handler);
 
 #endif

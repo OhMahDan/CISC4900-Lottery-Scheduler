@@ -4,15 +4,16 @@
  * Supports: positive integers as input, +, -, *, /
  * Error when dividing by zero
  */
-// REMOVE AFTER MAKING SYSCALL WRAPPERS
-#include <stdio.h>
+#include "stdio.h"
 
 void prerror(int error);
-int charToInt();
 int eval(int left, char op, int right, int *error);
 void intToChar(int num, char *result);
+static void skipSpaces(const char *buf, int *pos);
+static int parseInt(const char *buf, int *pos);
 
 /* main function: calculator
+ * line = input buffer
  * op = operator
  * resultChar = result of expression as char array
  * left = left side of operator
@@ -20,25 +21,49 @@ void intToChar(int num, char *result);
  * result = result of expression as an int
  * error = error flag
  */
-int main(){
-  char op;
+int calc_main(){
+  char line[64];
   char resultChar[12];
-  int left, right, result, error = 0;
+  int left, right, result, error;
+  char op;
+ 
+  char *prompt = "Calc booted. Enter equation (e.g. 1+2):\n";
+  for(int i = 0; prompt[i] != '\0'; i++) {
+    putchar(prompt[i]);
+  }
+ 
   while(1){
-    // extract left num, op, and right num
-    left = charToInt();
-    op = getchar();
-    getchar();
-    right = charToInt();
-    // evaluate
+
+    // Read the full line, THEN parse it.
+    readline(line, sizeof(line));
+ 
+    int pos = 0;
+    error = 0;
+ 
+    // Left operand
+    skipSpaces(line, &pos);
+    left = parseInt(line, &pos);
+ 
+    // Operator (single char; parseInt stopped right on it)
+    skipSpaces(line, &pos);
+    op = line[pos];
+    if(op != '\0') pos++;
+ 
+    // Right operand
+    skipSpaces(line, &pos);
+    right = parseInt(line, &pos);
+ 
+    // Evaluate
     result = eval(left, op, right, &error);
-    if(error == 1)
-      continue;
-    // convert int to char
+    if(error == 1) {
+      continue;   // Eval already printed the error message
+    }
+ 
+    // Convert and print
     intToChar(result, resultChar);
-    //print
-    for(int i = 0; resultChar[i] != '\0'; i++)
+    for(int i = 0; resultChar[i] != '\0'; i++) {
       putchar(resultChar[i]);
+    }
     putchar('\n');
   }
   return 0;
@@ -73,17 +98,15 @@ void prerror(int error){
   putchar('\n');
 }
 
-/* charToInt: Converts char to int
- * Input: nothing
- * Output: int value of char
- * Doesn't check for invalid inputs (e.g. a + b)
- */
-int charToInt(){
+static void skipSpaces(const char *buf, int *pos){
+  while(buf[*pos] == ' ') (*pos)++;
+}
+
+static int parseInt(const char *buf, int *pos){
   int total = 0;
-  char c = getchar();
-  while(c != ' ' && c != '\n'){
-    total = total * 10 + (c - '0');
-    c = getchar();
+  while(buf[*pos] >= '0' && buf[*pos] <= '9'){
+    total = total * 10 + (buf[*pos] - '0');
+    (*pos)++;
   }
   return total;
 }
@@ -153,7 +176,8 @@ void intToChar(int num, char *result){
   if(neg)
     result[j++] = '-';
   // copy and reverse temp to result 
-  while(i >= 0)
+  while(i >= 0) {
     result[j++] = temp[i--];
-    result[j] = '\0';
+  }
+  result[j] = '\0';
 }

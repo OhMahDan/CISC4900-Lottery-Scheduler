@@ -6,6 +6,6 @@
 #define SYS_GETCHAR 2
 
 // Assembly wrapper
-void syscall_handler();
+void syscall_handler_c();
 
 #endif
