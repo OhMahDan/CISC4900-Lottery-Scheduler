@@ -10,7 +10,7 @@ typedef struct {
     uint32_t prev_tss;      // Depreciated ts selector
     uint32_t esp0;          // Ring 0 stack pointer
     uint32_t ss0;           // Ring 0 stack segment selector
-    // Most fields below here are predominantly unused, predominantly for ring 1 and ring 2 use.
+    // Most fields below here are predominantly unused, for ring 1 and ring 2 use.
     uint32_t esp1;
     uint32_t ss1;
     uint32_t esp2;

@@ -5,9 +5,10 @@
 #include "pic.h"
 #include "tss.h"
 #include "io.h"
+#include "process.h"
 
-extern void calc_main();
-extern void launch_calculator(void *);
+extern void printA();
+extern void printB();
 
 void kernel_main(void) {
 
@@ -33,15 +34,10 @@ void kernel_main(void) {
     __asm__ volatile("sti");
     terminal_writestring("Keyboard handler loaded successfully!\n");
 
-    // Drop into Ring 3
-    // Set the TSS Ring 0 stack to our kernel stack so system calls dont crash.
-    // This will not be necessary when we fully implement our PCBs and process.c
-    uint32_t current_stack;
-    __asm__ volatile ("mov %%esp, %0" : "=r"(current_stack));
-    tss_set_stack(current_stack);
-
-    // Execute.
-    launch_calculator(calc_main);
+    // Drop into Ring 3 and begin running processes.
+    create_process(printA, 1);
+    create_process(printB, 1);
+    init_scheduler();
 
     // DO NOT REMOVE
     // A well-designed kernel should never attempt to return.
