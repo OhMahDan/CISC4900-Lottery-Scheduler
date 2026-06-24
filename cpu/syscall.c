@@ -2,6 +2,7 @@
 #include "kbd.h"
 #include "vga.h"
 #include "isr.h"
+#include "process.h"
 
 static void sys_putchar(char c);
 static uint8_t sys_getchar();
@@ -19,6 +20,9 @@ void syscall_handler_c(registers_t *regs){
     break;
   case SYS_GETCHAR:
     regs->eax = sys_getchar();
+    break;
+  case SYS_YIELD:
+    schedule();
     break;
   }
 }

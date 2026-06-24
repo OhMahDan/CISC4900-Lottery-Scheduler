@@ -21,4 +21,8 @@ typedef struct {
     //uint32_t page_directory;  // The CR3 value (if we implement paging later)
 } pcb_t;
 
+void create_process(void (*entry)(void), uint32_t tickets);
+void init_scheduler(void);
+void schedule(void);
+
 #endif
