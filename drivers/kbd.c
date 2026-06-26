@@ -2,7 +2,6 @@
 
 #include "kbd.h"
 #include "io.h"
-#include "isr.h"
 #include <stdint.h>
 
 #define PIC1_COMMAND 0x20
@@ -51,7 +50,7 @@ static volatile uint8_t write_pos = 0;
    It is hooked to IDT entry 33 (IRQ 1). "When int 33 fires, jump to this address".
    Read a byte from keyboard port and put into buffer.
  */
-void interrupt_kbd_handler_c(){
+void interrupt_kbd_handler_c(registers_t *r){
   uint8_t scancode;
   char c;
   scancode = inb(KBD_DATA_PORT);

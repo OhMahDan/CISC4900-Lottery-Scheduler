@@ -1,7 +1,6 @@
 #include "syscall.h"
 #include "kbd.h"
 #include "vga.h"
-#include "isr.h"
 #include "process.h"
 
 static void sys_putchar(char c);
@@ -13,13 +12,13 @@ static uint8_t sys_getchar();
  * ebx returns uint32_t so we need to type cast to char since terminal_putchar
    takes a char.
  */
-void syscall_handler_c(registers_t *regs){
-  switch(regs->eax){
+void syscall_handler_c(registers_t *r){
+  switch(r->eax){
   case SYS_PUTCHAR:
-    sys_putchar((char)regs->ebx);
+    sys_putchar((char)r->ebx);
     break;
   case SYS_GETCHAR:
-    regs->eax = sys_getchar();
+    r->eax = sys_getchar();
     break;
   case SYS_YIELD:
     schedule();
