@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include "isr.h"
 
+// Tick counter: Used for random number generator
+extern uint32_t ticks;
+
 // Sets the tick frequency for the PIT
 void PIT_init(uint32_t frequency);
 // Handler for when int 32 fires

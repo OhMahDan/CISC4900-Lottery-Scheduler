@@ -10,8 +10,8 @@
 #define EOI 0x20
 #define PIC1_COMMAND 0x20
 
-// REMOVE when scheduler is implemented
-static uint32_t ticks = 0;
+// Seed for random number generator
+uint32_t ticks = 0;
 
 /* pit_init: Sets the tick frequency for the OS timer (each tick, sends a signal down IRQ0).
  * divisor = the desired frequency.
