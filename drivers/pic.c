@@ -49,8 +49,7 @@ void PIC_remap(){
   io_wait();
   outb(PIC2_DATA, ICW4_8086);
   io_wait();
-  // Unmask IRQ1 for now (keyboard)
-  // REPLACE with MASK1 when timer interrupt is implemented
-  outb(PIC1_DATA, 0b11111101);
+  // Unmask IRQ0 (timer) and IRQ1 (keyboard)
+  outb(PIC1_DATA, MASK1);
   outb(PIC2_DATA, MASK2);
 }

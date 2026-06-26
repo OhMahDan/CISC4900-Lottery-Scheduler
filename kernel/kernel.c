@@ -6,9 +6,10 @@
 #include "tss.h"
 #include "io.h"
 #include "process.h"
+#include "pit.h"
 
-extern void printA();
-extern void printB();
+//extern void printA();
+//extern void printB();
 
 void kernel_main(void) {
 
@@ -30,14 +31,19 @@ void kernel_main(void) {
     PIC_remap();
     terminal_writestring("PIC successfully mapped!\n");
 
+    // Test PIT reconfiguration
+    terminal_writestring("Reconfiguring PIT frequency...\n");
+    PIT_init(100);
+    terminal_writestring("PIT frequency successfully changed to 100Hz!\n");
+
     // Enable hardware interrupts
     __asm__ volatile("sti");
     terminal_writestring("Keyboard handler loaded successfully!\n");
 
     // Drop into Ring 3 and begin running processes.
-    create_process(printA, 1);
-    create_process(printB, 1);
-    init_scheduler();
+    //create_process(printA, 1);
+    //create_process(printB, 1);
+    //init_scheduler();
 
     // DO NOT REMOVE
     // A well-designed kernel should never attempt to return.

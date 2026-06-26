@@ -34,7 +34,7 @@
 .endm
 
 IRQ 1, 33    # keyboard
-# IRQ 0, 32  # timer — for later
+IRQ 0, 32    # timer
 
 # int 0x80
 .global isr128
