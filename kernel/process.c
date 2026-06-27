@@ -66,7 +66,7 @@ void init_scheduler(void){
     swtch(&dummy_old, first->esp);
 }
 
-/* PRNG: Linear Congruential Generator -- x + 1 = (a * x + c) mod m, where x + 1 is in range [0, m - 1)
+/* PRNG: Linear Congruential Generator -- x + 1 = (a * x + c) mod m, where x + 1 is in range [0, m - 1]
  * seed = ticks from PIT
  * Sources:
    glibc/POSIX rand() manual
@@ -76,7 +76,9 @@ uint32_t rand(){
   if(seed == 0)
     seed = ticks;
   seed = seed * 1103515245 + 12345;
-  return seed;
+  // Discard lower 16 bits. POSIX does /65536 (2^16) which is equivalent to >> 16.
+  // Classic LCG problem: low bits of LCG outputs are poor quality.
+  return (seed >> 16);
 }
 
 // The main context switching function.
