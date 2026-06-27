@@ -1,6 +1,7 @@
 #include "process.h"
 #include "tss.h"
 #include "syscall.h"
+#include "pit.h"
 
 #define NUM_OF_PROCESSES 2
 #define KERNEL_STACK_SIZE 4096      // 4KB kernel stack size
@@ -17,6 +18,7 @@ __attribute__((aligned(4))) uint8_t kernel_stacks[NUM_OF_PROCESSES][KERNEL_STACK
 
 static uint32_t next_pid = 0;
 uint32_t current_pid = 0;
+static uint32_t seed = 0;
 
 // Function for creating user processes. This will construct the stack frame for the process for the scheduler to execute.
 void create_process(void (*entry)(void), uint32_t tickets){
@@ -62,6 +64,21 @@ void init_scheduler(void){
     current_pid = 0;
     tss_set_stack(first->kernel_stack);
     swtch(&dummy_old, first->esp);
+}
+
+/* PRNG: Linear Congruential Generator -- x + 1 = (a * x + c) mod m, where x + 1 is in range [0, m - 1]
+ * seed = ticks from PIT
+ * Sources:
+   glibc/POSIX rand() manual
+ * Mod result with number of distributed tickets
+ */
+uint32_t rand(){
+  if(seed == 0)
+    seed = ticks;
+  seed = seed * 1103515245 + 12345;
+  // Discard lower 16 bits. POSIX does /65536 (2^16) which is equivalent to >> 16.
+  // Classic LCG problem: low bits of LCG outputs are poor quality.
+  return (seed >> 16);
 }
 
 // The main context switching function.
