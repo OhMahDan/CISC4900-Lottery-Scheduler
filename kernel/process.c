@@ -83,10 +83,35 @@ uint32_t rand(){
 
 // The main context switching function.
 void schedule(void) {
+    uint32_t total_tickets = 0;
+    uint32_t winner = 0;
+    uint32_t accumulator = 0;
 
     // Get the old and new process PCBs.
     pcb_t *old = &process_table[current_pid];
-    current_pid = (current_pid + 1) % NUM_OF_PROCESSES;
+
+    // Lottery scheduler
+    // Count number of tickets from ready processes
+    for(uint32_t i = 0; i < NUM_OF_PROCESSES; i++){
+      if(process_table[i].state == PROCESS_READY || process_table[i].state == PROCESS_RUNNING)
+	total_tickets += process_table[i].tickets;
+    }
+    if(total_tickets == 0)
+      return;
+    // Pick random ticket winner
+    winner = rand() % total_tickets;
+    // Find process with winning ticket
+    // Since pcb only holds ticket count and not ticket ranges, we need accumulator to assign the ticket ranges.
+    for(uint32_t i = 0; i < NUM_OF_PROCESSES; i++){
+      if(process_table[i].state == PROCESS_READY || process_table[i].state == PROCESS_RUNNING){
+	accumulator += process_table[i].tickets;
+	if(accumulator > winner){
+	  current_pid = i;
+	  break;
+	}
+      }
+    }
+    
     pcb_t *new = &process_table[current_pid];
 
     // Set the new TSS

@@ -2,6 +2,7 @@
 #include "io.h"
 //REMOVE when scheduler is implemented
 #include "vga.h"
+#include "process.h"
 
 #define PIT_DATA_PORT 0x40
 #define PIT_COMMAND_PORT 0x43
@@ -34,13 +35,13 @@ void PIT_init(uint32_t frequency){
 }
 
 /* pit_handler: function that gets called at every tick.
- * As of now, all it does is send an EOI signal to the PIC.
+ * Calls lottery scheduler.
  */
 void PIT_handler_c(registers_t *r){
   // REMOVE when scheduler is implemented
   ticks++;
   if(ticks % 100 == 0)
     terminal_writestring("1 sec passed.\n");
-  // TODO: call scheduler here when it is implemented
+  //schedule();
   outb(PIC1_COMMAND, EOI);
 }

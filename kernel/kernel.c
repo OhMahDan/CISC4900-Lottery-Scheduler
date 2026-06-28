@@ -8,8 +8,8 @@
 #include "process.h"
 #include "pit.h"
 
-//extern void printA();
-//extern void printB();
+extern void printA();
+extern void printB();
 
 void kernel_main(void) {
 
@@ -41,9 +41,9 @@ void kernel_main(void) {
     terminal_writestring("Keyboard handler loaded successfully!\n");
 
     // Drop into Ring 3 and begin running processes.
-    //create_process(printA, 1);
-    //create_process(printB, 1);
-    //init_scheduler();
+    create_process(printA, 2);
+    create_process(printB, 8);
+    init_scheduler();
 
     // DO NOT REMOVE
     // A well-designed kernel should never attempt to return.
