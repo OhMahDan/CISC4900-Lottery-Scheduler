@@ -2,11 +2,17 @@
 #include "tss.h"
 #include "syscall.h"
 #include "pit.h"
+#include "vga.h"
+#include "stdlib.h"
 
 #define NUM_OF_PROCESSES 2
 #define KERNEL_STACK_SIZE 4096      // 4KB kernel stack size
 #define USER_STACK_BASE 0x00B00000  // Start of user space stack
 #define USER_STACK_SIZE 0x00100000  // Size of each process's user space stack (1MB)
+
+#define TEST_DRAWS 1000             // How many draws before we report
+static uint32_t run_counts[NUM_OF_PROCESSES] = {0};
+static uint32_t total_draws = 0;
 
 extern void swtch(uint32_t *old_esp, uint32_t new_esp);
 extern void trapret(void);
@@ -19,6 +25,29 @@ __attribute__((aligned(4))) uint8_t kernel_stacks[NUM_OF_PROCESSES][KERNEL_STACK
 static uint32_t next_pid = 0;
 uint32_t current_pid = 0;
 static uint32_t seed = 0;
+
+// Scheduler validation function. Prints the tally of times a process has run, then freezes so the results stay on screen.
+static void print_lottery_results() {
+    char buf[12];
+    terminal_writestring("\n=== LOTTERY RESULTS ===\n");
+    terminal_writestring("draws: ");
+    intToChar(total_draws, buf); 
+    terminal_writestring(buf);
+    terminal_writestring("\n");
+
+    for (uint32_t i = 0; i < NUM_OF_PROCESSES; i++) {
+        terminal_writestring("PID ");
+        intToChar(i, buf);
+        terminal_writestring(buf);
+        terminal_writestring(": ");
+        intToChar(run_counts[i], buf);
+        terminal_writestring(buf);
+        terminal_writestring(" wins  (");
+        intToChar(process_table[i].tickets, buf);
+        terminal_writestring(buf);
+        terminal_writestring(" tickets)\n");
+    }
+}
 
 // Function for creating user processes. This will construct the stack frame for the process for the scheduler to execute.
 void create_process(void (*entry)(void), uint32_t tickets){
@@ -83,11 +112,49 @@ uint32_t rand(){
 
 // The main context switching function.
 void schedule(void) {
+    uint32_t total_tickets = 0;
+    uint32_t winner = 0;
+    uint32_t accumulator = 0;
+    uint32_t old_pid = current_pid;
 
-    // Get the old and new process PCBs.
-    pcb_t *old = &process_table[current_pid];
-    current_pid = (current_pid + 1) % NUM_OF_PROCESSES;
-    pcb_t *new = &process_table[current_pid];
+    // Lottery scheduler
+    // Count number of tickets from ready processes
+    for(uint32_t i = 0; i < NUM_OF_PROCESSES; i++){
+      if(process_table[i].state == PROCESS_READY || process_table[i].state == PROCESS_RUNNING)
+	total_tickets += process_table[i].tickets;
+    }
+
+    if(total_tickets == 0)
+      return;
+
+    // Pick random ticket winner
+    winner = rand() % total_tickets;
+
+    uint32_t chosen = old_pid;
+    // Find process with winning ticket
+    // Since pcb only holds ticket count and not ticket ranges, we need accumulator to assign the ticket ranges.
+    for(uint32_t i = 0; i < NUM_OF_PROCESSES; i++){
+      if(process_table[i].state == PROCESS_READY || process_table[i].state == PROCESS_RUNNING){
+	accumulator += process_table[i].tickets;
+	if(accumulator > winner){
+	  chosen = i;
+	  break;
+	}
+      }
+    }
+
+    run_counts[chosen]++;
+    total_draws++;
+    if (total_draws >= TEST_DRAWS) {
+        print_lottery_results();
+        while(1);
+    }
+
+    if (chosen == old_pid) return;
+    
+    pcb_t *old = &process_table[old_pid];
+    pcb_t *new = &process_table[chosen];
+    current_pid = chosen;
 
     // Set the new TSS
     tss_set_stack(new->kernel_stack);
