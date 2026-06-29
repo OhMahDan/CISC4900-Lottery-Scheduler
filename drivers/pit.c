@@ -42,6 +42,6 @@ void PIT_handler_c(registers_t *r){
   ticks++;
   if(ticks % 100 == 0)
     terminal_writestring("1 sec passed.\n");
-  //schedule();
   outb(PIC1_COMMAND, EOI);
+  schedule();
 }

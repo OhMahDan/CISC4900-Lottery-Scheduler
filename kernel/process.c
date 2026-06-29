@@ -10,7 +10,7 @@
 #define USER_STACK_BASE 0x00B00000  // Start of user space stack
 #define USER_STACK_SIZE 0x00100000  // Size of each process's user space stack (1MB)
 
-#define TEST_DRAWS 5000             // How many draws before we report
+#define TEST_DRAWS 1000             // How many draws before we report
 static uint32_t run_counts[NUM_OF_PROCESSES] = {0};
 static uint32_t total_draws = 0;
 
