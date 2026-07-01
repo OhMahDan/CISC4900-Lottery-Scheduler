@@ -10,6 +10,7 @@
 
 extern void printA();
 extern void printB();
+extern void printC();
 
 void kernel_main(void) {
 
@@ -41,8 +42,9 @@ void kernel_main(void) {
     terminal_writestring("Keyboard handler loaded successfully!\n");
 
     // Drop into Ring 3 and begin running processes.
-    create_process(printA, 2);
-    create_process(printB, 8);
+    create_process(printA, 1);
+    create_process(printB, 3);
+    create_process(printC, 6);
     init_scheduler();
 
     // DO NOT REMOVE
