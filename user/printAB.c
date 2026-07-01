@@ -15,3 +15,9 @@ void printB() {
         print("B");
     }
 }
+
+void printC() {
+    while (1) {
+        print("C");
+    }
+}
